@@ -1,6 +1,7 @@
 package com.mironouz.remoteschoolapi
 
 import com.mironouz.remoteschoolapi.config.appConfig
+import de.flapdoodle.embed.mongo.distribution.Version
 import org.springframework.boot.WebApplicationType
 import org.springframework.fu.kofu.application
 import org.springframework.fu.kofu.mongo.reactiveMongodb
@@ -13,7 +14,11 @@ val app = application(WebApplicationType.REACTIVE) {
             jackson()
         }
     }
-    reactiveMongodb {}
+    reactiveMongodb {
+        embedded {
+            version = Version.Main.PRODUCTION
+        }
+    }
 }
 
 fun main() {

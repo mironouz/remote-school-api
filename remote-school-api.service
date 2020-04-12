@@ -1,0 +1,23 @@
+[Unit]
+Description=remote-school api
+Documentation=https://github.com/mironouz/remote-school-api
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=simple
+TimeoutStartSec=0
+Restart=on-failure
+RestartSec=30s
+ExecStartPre=-/usr/bin/docker kill remote-school-api
+ExecStartPre=-/usr/bin/docker rm remote-school-api
+ExecStartPre=/usr/bin/docker pull mironouz/remote-school:api
+ExecStart=/usr/bin/docker run \
+          --name remote-school-api \
+          --publish 8081:8080 \
+          mironouz/remote-school:api
+SyslogIdentifier=remote-school-api
+ExecStop=/usr/bin/docker stop remote-school-api
+
+[Install]
+WantedBy=multi-user.target
