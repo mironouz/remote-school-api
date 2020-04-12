@@ -14,5 +14,8 @@ class UserHandler(private val repository: UserRepository) {
     }
 
     suspend fun findAll(serverRequest: ServerRequest): ServerResponse =
-            ok().sse().body(repository.findAll(), User::class.java).awaitLast()
+            ok().sse()
+                    .header("Access-Control-Allow-Origin", "*")
+                    .body(repository.findAll(), User::class.java)
+                    .awaitLast()
 }

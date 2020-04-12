@@ -23,6 +23,8 @@ val appConfig = configuration {
 }
 
 fun route(userHandler: UserHandler) = coRouter {
-    POST("/register", userHandler::registerUser)
-    GET("/users", userHandler::findAll)
+    "/api".nest {
+        POST("/register", userHandler::registerUser)
+        GET("/users", userHandler::findAll)
+    }
 }
