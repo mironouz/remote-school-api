@@ -5,7 +5,6 @@ import org.springframework.data.mongodb.core.CollectionOptions
 import org.springframework.data.mongodb.core.ReactiveMongoOperations
 import org.springframework.data.mongodb.core.oneAndAwait
 import org.springframework.data.mongodb.repository.Tailable
-import reactor.core.publisher.Mono
 
 class UserRepository(private val mongo: ReactiveMongoOperations){
     suspend fun save(user: User): User = mongo.insert(User::class.java).oneAndAwait(user)
