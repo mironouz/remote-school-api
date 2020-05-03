@@ -1,6 +1,8 @@
 package com.mironouz.remoteschoolapi.config
 
+import com.mironouz.remoteschoolapi.handler.MessageHandler
 import com.mironouz.remoteschoolapi.handler.UserHandler
+import com.mironouz.remoteschoolapi.repository.MessageRepository
 import com.mironouz.remoteschoolapi.repository.UserRepository
 import kotlinx.coroutines.runBlocking
 import org.springframework.boot.context.event.ApplicationReadyEvent
@@ -18,13 +20,15 @@ import java.util.concurrent.ConcurrentHashMap
 val appConfig = configuration {
     beans {
         bean<UserRepository>()
+        bean<MessageRepository>()
         bean<UserHandler>()
+        bean<MessageHandler>()
         bean(::route)
     }
     listener<ApplicationReadyEvent> {
         runBlocking {
-            ref<UserRepository>().recreateCollection()
-            print("User collection created")
+            ref<MessageRepository>().recreateCollection()
+            print("Messages collection created")
         }
     }
 }
@@ -51,9 +55,10 @@ val securityConfig = configuration {
     }
 }
 
-fun route(userHandler: UserHandler) = coRouter {
+fun route(userHandler: UserHandler, messageHandler: MessageHandler) = coRouter {
     "/api".nest {
         POST("/register", userHandler::registerUser)
-        GET("/users", userHandler::findAll)
+        POST("/message", messageHandler::postMessage)
+        GET("/messages", messageHandler::findAll)
     }
 }
