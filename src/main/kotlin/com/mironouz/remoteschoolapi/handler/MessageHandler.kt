@@ -18,6 +18,9 @@ class MessageHandler(private val repository: MessageRepository) {
 
     suspend fun findAll(serverRequest: ServerRequest): ServerResponse =
             ServerResponse.ok().sse()
+                    // disable nginx buffering (fix for ssl)
+                    // see: https://stackoverflow.com/questions/27898622
+                    .header("X-Accel-Buffering", "no")
                     .body(repository.findAll(), Message::class.java)
                     .awaitLast()
 }
