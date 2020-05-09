@@ -14,15 +14,15 @@ class UserHandler(private val repository: UserRepository, private val userServic
         val user = request.awaitBody<User>()
         repository.save(user)
         userService
-                .findByUsername(user.name)
+                .findByUsername(user.password)
                 .switchIfEmpty {
                     val userDetails = org.springframework.security.core.userdetails.User
                             .withDefaultPasswordEncoder()
-                            .username(user.name)
-                            .password("{noop}" + user.surname)
+                            .username(user.email)
+                            .password("")
                             .roles("USER")
                             .build()
-                    userService.updatePassword(userDetails, "{noop}" + user.surname)
+                    userService.updatePassword(userDetails, "{noop}" + user.password)
                 }
                 .block()
         return ServerResponse.accepted().buildAndAwait()
