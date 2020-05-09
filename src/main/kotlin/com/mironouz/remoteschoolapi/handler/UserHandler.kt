@@ -12,9 +12,13 @@ import reactor.kotlin.core.publisher.switchIfEmpty
 class UserHandler(private val repository: UserRepository, private val userService: MapReactiveUserDetailsService) {
     suspend fun registerUser(request: ServerRequest) : ServerResponse {
         val user = request.awaitBody<User>()
+        var serverResponse = ServerResponse.accepted()
         repository.save(user)
         userService
-                .findByUsername(user.password)
+                .findByUsername(user.email)
+                .doOnNext {
+                    serverResponse = ServerResponse.status(409)
+                }
                 .switchIfEmpty {
                     val userDetails = org.springframework.security.core.userdetails.User
                             .withDefaultPasswordEncoder()
@@ -25,6 +29,6 @@ class UserHandler(private val repository: UserRepository, private val userServic
                     userService.updatePassword(userDetails, "{noop}" + user.password)
                 }
                 .block()
-        return ServerResponse.accepted().buildAndAwait()
+        return serverResponse.buildAndAwait()
     }
 }
