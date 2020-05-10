@@ -1,10 +1,11 @@
 package com.mironouz.remoteschoolapi.model
 
+import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 
 @Document
 data class User(val name: String,
                 val surname: String,
                 val grade: Grade,
-                val email: String,
+                @Id val email: String,
                 val password: String)
