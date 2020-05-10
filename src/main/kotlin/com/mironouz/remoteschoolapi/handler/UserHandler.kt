@@ -34,4 +34,8 @@ class UserHandler(private val repository: UserRepository, private val userServic
         }
         return ServerResponse.status(status).buildAndAwait()
     }
+
+    suspend fun checkUser(request: ServerRequest) : ServerResponse {
+        return ServerResponse.ok().buildAndAwait()
+    }
 }

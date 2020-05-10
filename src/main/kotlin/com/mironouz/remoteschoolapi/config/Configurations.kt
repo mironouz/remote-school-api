@@ -60,5 +60,6 @@ fun route(userHandler: UserHandler, messageHandler: MessageHandler) = coRouter {
         POST("/register", userHandler::registerUser)
         POST("/message", messageHandler::postMessage)
         GET("/messages", messageHandler::findAll)
+        GET("/checkUser", userHandler::checkUser)
     }
 }
