@@ -11,6 +11,8 @@ import org.springframework.web.reactive.function.server.buildAndAwait
 import reactor.kotlin.core.publisher.switchIfEmpty
 
 class UserHandler(private val repository: UserRepository, private val userService: MapReactiveUserDetailsService) {
+    private class Auth(val email: String, val password: String)
+
     suspend fun registerUser(request: ServerRequest) : ServerResponse {
         val user = request.awaitBody<User>()
         var status = HttpStatus.ACCEPTED
@@ -36,6 +38,15 @@ class UserHandler(private val repository: UserRepository, private val userServic
     }
 
     suspend fun checkUser(request: ServerRequest) : ServerResponse {
-        return ServerResponse.ok().buildAndAwait()
+        val auth = request.awaitBody<Auth>()
+        var status = HttpStatus.BAD_REQUEST
+        userService
+                .findByUsername(auth.email)
+                .doOnNext {
+                    print(it.password + " " + auth.password)
+                    status = if ("{noop}${auth.password}" == it.password) HttpStatus.OK else HttpStatus.CONFLICT
+                }
+                .subscribe()
+        return ServerResponse.status(status).buildAndAwait()
     }
 }

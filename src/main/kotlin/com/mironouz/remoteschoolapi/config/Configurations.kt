@@ -44,7 +44,7 @@ val securityConfig = configuration {
                             UserDetailsRepositoryReactiveAuthenticationManager(ref<MapReactiveUserDetailsService>()))
                     .csrf().disable()
                     .authorizeExchange()
-                    .pathMatchers("/api/register").permitAll()
+                    .pathMatchers("/api/register", "/api/checkUser").permitAll()
                     .anyExchange().authenticated()
                     .and()
                     .httpBasic().and()
@@ -60,6 +60,6 @@ fun route(userHandler: UserHandler, messageHandler: MessageHandler) = coRouter {
         POST("/register", userHandler::registerUser)
         POST("/message", messageHandler::postMessage)
         GET("/messages", messageHandler::findAll)
-        GET("/checkUser", userHandler::checkUser)
+        POST("/checkUser", userHandler::checkUser)
     }
 }
