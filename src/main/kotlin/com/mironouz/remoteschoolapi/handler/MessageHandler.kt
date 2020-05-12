@@ -25,7 +25,7 @@ class MessageHandler(private val messageRepository: MessageRepository,
         return ServerResponse.accepted().buildAndAwait()
     }
 
-    suspend fun findAll(serverRequest: ServerRequest): ServerResponse =
+    suspend fun findAll(@Suppress("UNUSED_PARAMETER") request: ServerRequest): ServerResponse =
             ServerResponse.ok().sse()
                     // disable nginx buffering (fix for ssl)
                     // see: https://stackoverflow.com/questions/27898622

@@ -43,7 +43,6 @@ class UserHandler(private val repository: UserRepository, private val userServic
         userService
                 .findByUsername(auth.email)
                 .doOnNext {
-                    print(it.password + " " + auth.password)
                     status = if ("{noop}${auth.password}" == it.password) HttpStatus.OK else HttpStatus.CONFLICT
                 }
                 .subscribe()

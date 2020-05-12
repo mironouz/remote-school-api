@@ -1,7 +1,9 @@
 package com.mironouz.remoteschoolapi.config
 
+import com.mironouz.remoteschoolapi.handler.ExerciseHandler
 import com.mironouz.remoteschoolapi.handler.MessageHandler
 import com.mironouz.remoteschoolapi.handler.UserHandler
+import com.mironouz.remoteschoolapi.repository.ExerciseRepository
 import com.mironouz.remoteschoolapi.repository.MessageRepository
 import com.mironouz.remoteschoolapi.repository.UserRepository
 import kotlinx.coroutines.runBlocking
@@ -21,8 +23,10 @@ val appConfig = configuration {
     beans {
         bean<UserRepository>()
         bean<MessageRepository>()
+        bean<ExerciseRepository>()
         bean<UserHandler>()
         bean<MessageHandler>()
+        bean<ExerciseHandler>()
         bean(::route)
     }
     listener<ApplicationReadyEvent> {
@@ -55,11 +59,14 @@ val securityConfig = configuration {
     }
 }
 
-fun route(userHandler: UserHandler, messageHandler: MessageHandler) = coRouter {
+fun route(userHandler: UserHandler, messageHandler: MessageHandler, exerciseHandler: ExerciseHandler) = coRouter {
     "/api".nest {
         POST("/register", userHandler::registerUser)
         POST("/message", messageHandler::postMessage)
         GET("/messages", messageHandler::findAll)
         POST("/checkUser", userHandler::checkUser)
+        POST("/exercise", exerciseHandler::postExercise)
+        GET("/exercises", exerciseHandler::listExercises)
+        GET("/exercise/{id}", exerciseHandler::listExercise)
     }
 }
