@@ -19,7 +19,7 @@ repositories {
 }
 
 dependencies {
-	implementation("org.springframework.fu:spring-fu-kofu:0.3.0.BUILD-SNAPSHOT")
+	implementation("org.springframework.fu:spring-fu-kofu:0.3.0.M5")
 	implementation("org.springframework.boot:spring-boot-starter-data-mongodb-reactive")
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("org.springframework.boot:spring-boot-starter-webflux")
