@@ -4,6 +4,7 @@ import com.mironouz.remoteschoolapi.model.Message
 import com.mironouz.remoteschoolapi.repository.MessageRepository
 import com.mironouz.remoteschoolapi.repository.UserRepository
 import kotlinx.coroutines.reactive.awaitLast
+import org.springframework.http.codec.ServerSentEvent
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.reactive.function.server.awaitBody
@@ -30,6 +31,18 @@ class MessageHandler(private val messageRepository: MessageRepository,
                     // disable nginx buffering (fix for ssl)
                     // see: https://stackoverflow.com/questions/27898622
                     .header("X-Accel-Buffering", "no")
-                    .body(messageRepository.findAll(), Message::class.java)
+                    .body(messageRepository.findAll()
+                            .filter {
+                                it.timestamp.time > request
+                                        .headers()
+                                        .header("Last-Event-ID")
+                                        .getOrElse(0) { "0" }.toLong()
+                            }
+                            .map {
+                                ServerSentEvent.builder<Message>()
+                                        .id(it.timestamp.time.toString())
+                                        .data(it)
+                                        .build()
+                            }, Message::class.java)
                     .awaitLast()
 }
