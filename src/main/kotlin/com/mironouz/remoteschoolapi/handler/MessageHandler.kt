@@ -10,6 +10,8 @@ import org.springframework.web.reactive.function.server.awaitBody
 import org.springframework.web.reactive.function.server.awaitPrincipal
 import org.springframework.web.reactive.function.server.buildAndAwait
 import org.springframework.web.reactive.function.server.sse
+import reactor.core.publisher.Flux
+import java.time.Duration
 import java.util.Date
 
 class MessageHandler(private val messageRepository: MessageRepository,
@@ -17,6 +19,11 @@ class MessageHandler(private val messageRepository: MessageRepository,
 
     private class AdHocMessage(val text: String, val timestamp: Date)
     private val messageStream = messageRepository.findAll().share()
+    private val heartbeat = Flux.interval(Duration.ofSeconds(10)).map { "heartbeat" }
+
+    init {
+        messageStream.subscribe()
+    }
 
     suspend fun postMessage(request: ServerRequest) : ServerResponse {
         val principal = request.awaitPrincipal()
@@ -31,6 +38,6 @@ class MessageHandler(private val messageRepository: MessageRepository,
                     // disable nginx buffering (fix for ssl)
                     // see: https://stackoverflow.com/questions/27898622
                     .header("X-Accel-Buffering", "no")
-                    .body(messageStream, Message::class.java)
+                    .body(Flux.merge(messageStream, heartbeat), Message::class.java)
                     .awaitLast()
 }
